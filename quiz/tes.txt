@@ -1,0 +1,56 @@
+[
+    {
+        "number":1,
+        "problem":"Apakah anda kontol?",
+        "type":"True / False",
+        "answer":"True",
+        "choices": [
+            {
+                "choice_text":"True"
+            },
+            {
+                "choice_text":"False"
+            }
+        ]
+    },
+    {
+        "number":2,
+        "problem":"Apakah saya kontol?",
+        "type":"True / False",
+        "answer":"False",
+        "choices": [
+            {
+                "choice_text":"True"
+            },
+            {
+                "choice_text":"False"
+            }
+        ]
+    },
+    {
+        "number":3,
+        "problem":"Siapa yang paling kontol?",
+        "type":"Multiple Choices",
+        "answer":"nadip",
+        "choices": [
+            {
+                "choice_text":"Ezar"
+            },
+            {
+                "choice_text":"Felix"
+            },
+            {
+                "choice_text":"Farrel"
+            },
+            {
+                "choice_text":"nadip"
+            }
+        ]
+    },
+    {
+        "number":4,
+        "problem":"Sebut orang yang paling kontol!",
+        "type":"Short Essay",
+        "answer":"nadip"
+    }
+]
