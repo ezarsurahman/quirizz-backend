@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     "corsheaders",
 
     # Modules
-    'quiz'
+    'quiz',
+    'questions',
+    'submission'
 ]
 
 MIDDLEWARE = [

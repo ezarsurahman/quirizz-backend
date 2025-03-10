@@ -1,8 +1,8 @@
 import json
 from rest_framework.views import APIView, Response
 
-from quiz.models import Choices, Question, Quiz
-from quiz.serializers import ChoicesSerializer, QuestionSerializer
+from questions.models import Choices, Question, Quiz
+from questions.serializers import ChoicesSerializer, QuestionSerializer
 from quiz.views import success_response, error_response
 
 class CreateListQuestions(APIView):
@@ -33,13 +33,17 @@ class CreateListQuestions(APIView):
             choices_data = None
             if question["choices"]:
                 choices_data = json.loads(question.pop("choices",None))
-            serializer = QuestionSerializer(data=request.data)
+            serializer = QuestionSerializer(data=question)
             if serializer.is_valid():
                 question_instance = serializer.save()
                 if question.get("type") == "Multiple Choices" or question.get("type") == 'True / False' and choices_data:
                     for choice_data in choices_data:
                         Choices.objects.create(question=question_instance, choice_text=choice_data["choice_text"])
-            return success_response(serializer.data, message="Question creation successfull")
+                return success_response(serializer.data, message="Question creation successfull")
+            else :
+                print("question invalid")
+                
+            return error_response("Question not valid")
         except Quiz.DoesNotExist as e:
             print(e)
             return error_response(status=404,
@@ -86,7 +90,6 @@ class QuestionByID(APIView):
             quiz = Quiz.objects.get(id=quiz_id)
             question = Question.objects.get(id=id)
             if question.quiz.id != quiz.id:
-                print("not same")
                 return error_response(  
                     status=400,
                     message="Question doesn't belong to Quiz",
@@ -96,7 +99,6 @@ class QuestionByID(APIView):
             choices_data = None
             if new_question["choices"]:
                 choices_data = json.loads(new_question.pop("choices",None))
-                print(type(choices_data))
             serializer = QuestionSerializer(question,data=request.data)
             if serializer.is_valid():
                 question_instance = serializer.save()
@@ -106,7 +108,6 @@ class QuestionByID(APIView):
 
                 if new_question.get("type") == "Multiple Choices" or new_question.get("type") == 'True / False' and choices_data:
                     for choice_data in choices_data:
-                        # print(end="")
                         Choices.objects.create(question=question_instance, choice_text=choice_data["choice_text"])
             return success_response("", message="Question deleted successfully")
         except Question.DoesNotExist as e :

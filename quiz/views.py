@@ -1,5 +1,8 @@
-from .models import Choices, Question, Quiz
-from .serializers import ChoicesSerializer, QuestionSerializer, QuizSerializer
+from questions.models import Choices, Question
+from questions.serializers import ChoicesSerializer, QuestionSerializer
+from submission.models import Submission
+from .models import  Quiz
+from .serializers import  QuizSerializer
 from rest_framework.views import APIView, Response
 from django.db.models import Q
 from datetime import datetime, timedelta
@@ -63,9 +66,6 @@ def get_questions(quiz):
     return question_serializer.data
 
 class QuizListCreate(APIView):
-
-
-
     def get(self, request):
         try:
             search = request.GET.get('search')
@@ -78,7 +78,6 @@ class QuizListCreate(APIView):
 
             serialized_quiz = QuizSerializer(quizzes,many=True)
             for quiz in serialized_quiz.data:
-                quiz["questions"] = get_questions(quiz)
                 quiz["question_count"] = len(Question.objects.filter(quiz=quiz["id"]))
 
             data = {
@@ -94,6 +93,8 @@ class QuizListCreate(APIView):
     def post(self,request):
         try:
             serializer = QuizSerializer(data=request.data)
+            if serializer.is_valid():
+                print(serializer.validated_data)
             title = request.data.get("title")
             if Quiz.objects.filter(title=title):
                 return error_response(f"Quiz with title {title} already exists.", status=400 ,message="Quiz title already exists")
@@ -114,17 +115,24 @@ class QuizByID(APIView):
                 return error_response(e,status=404)
             
             serializer = QuizSerializer(quiz)
-            return success_response(message="Quiz retrieval successfull",data=serializer.data)
+            data = serializer.data
+            data["question_count"] = len(Question.objects.filter(quiz=quiz.id))
+            try:
+                data["grade"] = Submission.objects.get(quiz=quiz).grade
+                data["submitted"] = Submission.objects.get(quiz=quiz).submitted
+            except:
+                pass
+            return success_response(message="Quiz retrieval successfull",data=data)
         except Exception as e:
             return error_response(e)
     
     def delete(self,request,id):
         try:
-        
             quiz = Quiz.objects.get(pk=id)
             serializer = QuizSerializer(quiz)
+            quiz_data = serializer.data
             quiz.delete()
-            return success_response(serializer.data)
+            return success_response(quiz_data)
         except Exception as e:
             return error_response(e)
         
@@ -132,7 +140,7 @@ class QuizByID(APIView):
         try:
             data = request.data
             try:
-                quiz = Quiz.objects.get(pk=id)
+                quiz = Quiz.objects.get(id=id)
             except Exception as e:
                 return error_response(e, status=404)
             serializer = QuizSerializer(quiz,data=data)
