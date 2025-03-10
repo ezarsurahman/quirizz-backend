@@ -19,7 +19,7 @@ Quick guide on how to get started with this project.
 
 ### Clone the repository
 ```bash
-git clone https://github.com/your-username/quirizz-backend.git
+git clone https://github.com/ezarsurahman/quirizz-backend.git
 ```
 ### Move into the directory
 ```
